@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="userMapper">
+	
+	<resultMap type="user" id="user_rm">
+	
+		<id property="userNo" column="USER_NO"/>
+		
+		<result property="userId" 		column="USER_ID"/>
+		<result property="userPwd" 		column="USER_PWD"/>
+		<result property="userName" 		column="USER_NAME"/>
+		<result property="userRegion" 		column="USER_REGION"/>
+		<result property="userGender" 		column="USER_GENDER"/>
+		<result property="enrollDate" 		column="ENROLL_DATE"/>
+	</resultMap>
+
+	
+  	<select id="login" parameterType="user" resultMap="user_rm">	
+		SELECT USER_NO, USER_ID, USER_PWD, USER_NAME, USER_REGION, 
+		USER_GENDER, TO_CHAR( ENROLL_DATE, 'YYYY-MM-DD HH24:MI:SS') AS ENROLL_DATE
+		FROM GRAM_USER
+		WHERE USER_ID = #{userId} AND USER_PWD = #{userPwd}
+  	</select>
+  	
+  	<insert id="signUp" parameterType="user"  useGeneratedKeys="true">
+  		<selectKey keyProperty="userNo"  resultType="_int"  order="BEFORE">
+			SELECT SEQ_USER_NO.NEXTVAL FROM DUAL
+		</selectKey>
+		
+  		INSERT INTO GRAM_USER VALUES(
+		   #{userNo}, #{userId}, #{userPwd}, #{userName}, #{userRegion}, #{userGender}, SYSDATE
+		)
+  	</insert>
+</mapper>
+
+

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="cardMapper">
+	
+	<resultMap type="card" id="card_rm">
+	
+		<id property="cardNo" column="CARD_NO"/>
+		
+		<result property="content" 		column="CARD_CONTENT"/>
+		<result property="feeling" 		column="CARD_FEELING"/>
+		<result property="cardStatus" 		column="CARD_ST"/>
+		<result property="userNo" 		column="USER_NO"/>
+		
+		<result property="createDt" 		column="CREATE_DT"/>
+		<result property="like" 		column="CARD_LIKE"/>
+		<result property="readCount" 		column="CARD_COUNT"/>
+		<result property="userName" 		column="USER_NAME"/>
+		<result property="userRegion" 		column="USER_REGION"/>
+	</resultMap>
+
+	
+  	<select id="selectAll" resultMap="card_rm">	
+  		SELECT CARD_NO, CARD_CONTENT, CARD_FEELING, CARD_ST,
+  		USER_NO, CREATE_DT, CARD_LIKE, CARD_COUNT, USER_NAME, USER_REGION
+  		FROM GRAM_CARD
+  		JOIN GRAM_USER USING(USER_NO)
+  		WHERE CARD_ST = 'Y'
+  		ORDER BY CARD_NO DESC
+  	</select>
+	
+	<select id="searchList" resultMap="card_rm">	
+  		SELECT CARD_NO, CARD_CONTENT, CARD_FEELING, CARD_ST,
+  		USER_NO, CREATE_DT, CARD_LIKE, CARD_COUNT, USER_NAME, USER_REGION
+  		FROM GRAM_CARD
+  		JOIN GRAM_USER USING(USER_NO)
+  		WHERE CARD_ST = 'Y'
+  		AND CARD_CONTENT LIKE '%' || #{searchWord} || '%'
+  		OR USER_NAME LIKE '%' || #{searchWord} || '%'
+  		ORDER BY CARD_NO DESC
+  	</select>
+  	
+  	<update id="increaseLike" parameterType="_int">
+		UPDATE GRAM_CARD
+		SET CARD_LIKE = CARD_LIKE + 1
+		WHERE CARD_NO = ${cardNo}
+  	</update>
+  	
+  	<update id="increaseReadCount" parameterType="_int">
+		UPDATE GRAM_CARD
+		SET CARD_COUNT = CARD_COUNT + 1
+		WHERE CARD_NO = ${cardNo}
+  	</update>
+  	
+  	<insert id="insertCard"  parameterType="map"  useGeneratedKeys="true">
+  	
+  		<selectKey keyProperty="cardNo"  resultType="_int"  order="BEFORE">
+			SELECT SEQ_CARD_NO.NEXTVAL FROM DUAL
+		</selectKey>
+  		INSERT INTO GRAM_CARD VALUES(
+		   #{cardNo}, #{content}, #{feeling}, 'Y', ${userNo}, SYSDATE, 0, 0
+		)
+  	</insert>
+</mapper>
+
+
